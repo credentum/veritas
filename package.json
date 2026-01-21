@@ -1,0 +1,32 @@
+{
+  "name": "veritas-mcp-server",
+  "version": "0.1.0",
+  "description": "Transaction Witness MCP Server - Cryptographic decision provenance for autonomous agents",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "tsx src/test-latency.ts"
+  },
+  "keywords": [
+    "mcp",
+    "ai-agents",
+    "audit-trail",
+    "decision-provenance",
+    "arweave",
+    "compliance"
+  ],
+  "author": "Credentum",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@permaweb/aoconnect": "^0.0.57"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
