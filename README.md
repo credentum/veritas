@@ -2,7 +2,9 @@
 
 > Transaction Witness for autonomous agent decisions. The "Blue Checkmark" for AI.
 
-**Status:** PoC (Proof of Concept)
+**Status:** Production
+**API:** `http://api.credentum.ai:3100`
+**AO Process:** `6R8xLNXKFEjycjsb6J5bj1Y0k65KYAM6wUCd1GSsP9Q`
 **Latency:** P99 < 1ms (target was <100ms)
 **Throughput:** ~24,000 receipts/second
 
@@ -14,7 +16,31 @@ Veritas is an MCP (Model Context Protocol) server that provides cryptographic pr
 2. **Enable payments** — Provide receipts that AP2 payment gateways can require
 3. **Cross-vendor auditing** — Neutral "Switzerland" position across walled gardens
 
-## Quick Start
+## Production API
+
+The Veritas HTTP API is live and publicly accessible:
+
+```bash
+# Witness a decision
+curl -X POST http://api.credentum.ai:3100/witness \
+  -H "Content-Type: application/json" \
+  -d '{
+    "context": "Agent evaluating transaction",
+    "logic": "Amount $50 under threshold, auto-approve",
+    "action": "APPROVE_TRANSACTION"
+  }'
+
+# Verify a receipt
+curl http://api.credentum.ai:3100/verify/vts_abc123...
+
+# Check server info
+curl http://api.credentum.ai:3100/info
+
+# Health check
+curl http://api.credentum.ai:3100/health
+```
+
+## Quick Start (Local Development)
 
 ```bash
 # Install dependencies
