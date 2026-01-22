@@ -1,0 +1,6 @@
+# Ignore all wallet files
+*.json
+!*.example.json
+
+# Keep directory structure
+!.gitignore

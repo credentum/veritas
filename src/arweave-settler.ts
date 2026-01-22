@@ -45,9 +45,9 @@ const DEFAULT_PROCESS_ID = process.env.VERITAS_PROCESS_ID || null;
 function loadWallet(): object | null {
   const locations = [
     process.env.WALLET_PATH,
+    join(process.cwd(), "wallets", "wallet.json"),
     join(homedir(), ".aos.json"),
     join(homedir(), "wallet.json"),
-    join(process.cwd(), "wallet.json"),
   ].filter(Boolean) as string[];
 
   for (const path of locations) {
@@ -127,7 +127,7 @@ export async function settleToArweave(
       process: targetProcess,
       signer,
       tags: [
-        { name: "Action", value: "SettleReceipts" },
+        { name: "Action", value: "StoreReceipts" },
         { name: "Veritas-Version", value: "0.1.0" },
         { name: "Receipt-Count", value: String(receipts.length) },
       ],

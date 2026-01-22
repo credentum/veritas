@@ -1,0 +1,14 @@
+{
+  "_comment": "This is an example. Replace with your actual Arweave wallet.",
+  "_instructions": "1. Get wallet from arweave.app or use aos CLI (~/.aos.json)",
+  "_instructions2": "2. Copy to wallet.json in this directory",
+  "kty": "RSA",
+  "n": "your-public-modulus",
+  "e": "AQAB",
+  "d": "your-private-exponent",
+  "p": "...",
+  "q": "...",
+  "dp": "...",
+  "dq": "...",
+  "qi": "..."
+}

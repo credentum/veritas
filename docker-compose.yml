@@ -1,0 +1,48 @@
+# =============================================================================
+# Veritas - Transaction Witness Service
+# =============================================================================
+#
+# SETUP:
+#     1. node scripts/spawn-process.mjs               # Create AO process (once)
+#     2. cp wallets/wallet.json.example wallets/wallet.json  # Add your wallet
+#     3. Edit .env with your VERITAS_PROCESS_ID
+#     4. docker compose up -d
+#
+# VERIFY:
+#     curl http://localhost:3100/health
+#     curl http://localhost:3100/info
+#
+# =============================================================================
+
+services:
+  veritas:
+    build: .
+    container_name: veritas
+    ports:
+      - "3100:3000"
+
+    volumes:
+      # Arweave wallet (for signing settlement messages)
+      - ./wallets:/app/wallets:ro
+
+    environment:
+      PORT: "3000"
+      # AO process ID from spawn-process.mjs
+      VERITAS_PROCESS_ID: ${VERITAS_PROCESS_ID}
+      # Wallet path inside container
+      WALLET_PATH: /app/wallets/wallet.json
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+    restart: unless-stopped
+
+    networks:
+      - veritas-net
+
+networks:
+  veritas-net:
+    driver: bridge

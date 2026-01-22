@@ -6,9 +6,12 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
-    "test": "tsx src/test-latency.ts"
+    "dev": "tsx watch src/http-server.ts",
+    "start": "node dist/http-server.js",
+    "start:mcp": "node dist/index.js",
+    "dev:mcp": "tsx watch src/index.ts",
+    "test": "tsx src/test-latency.ts",
+    "spawn": "node scripts/spawn-process.mjs"
   },
   "keywords": [
     "mcp",
