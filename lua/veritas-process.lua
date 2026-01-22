@@ -20,32 +20,40 @@ local json = require("json")
 -- ============================================================================
 
 -- Initialize state on first load (idempotent)
+-- Owner is set immediately from spawn to prevent nil==nil bypass
 State = State or {
     Receipts = {},           -- receipt_id -> receipt_data
     ReceiptCount = 0,        -- total receipts stored
-    Owner = nil,             -- set from spawn message
+    Owner = ao.env.Process.Owner or ao.id,  -- Set from spawn, never nil
+    Frozen = false,          -- Emergency stop flag
     Version = "0.1.0"
 }
-
--- Capture owner from spawn (first message sets owner)
-if not State.Owner then
-    State.Owner = ao.env.Process.Owner or ao.id
-end
 
 -- ============================================================================
 -- HELPER FUNCTIONS
 -- ============================================================================
 
+local function safe_json_encode(data)
+    local ok, result = pcall(json.encode, data)
+    if ok then
+        return result
+    end
+    return '{"error":"JSON encode failed"}'
+end
+
 local function send_reply(msg, action, data)
+    -- Guard against nil msg.From
+    if not msg.From then return end
+
     ao.send({
         Target = msg.From,
         Action = action,
-        Data = json.encode(data)
+        Data = safe_json_encode(data)
     })
 end
 
 local function is_owner(msg)
-    return msg.From == State.Owner
+    return msg.From and msg.From == State.Owner
 end
 
 local function parse_data(msg)
@@ -72,6 +80,12 @@ Handlers.add(
     "StoreReceipts",
     Handlers.utils.hasMatchingTag("Action", "StoreReceipts"),
     function(msg)
+        -- Frozen check
+        if State.Frozen then
+            send_reply(msg, "Error", { error = "Process is frozen" })
+            return
+        end
+
         -- Owner check
         if not is_owner(msg) then
             send_reply(msg, "Error", { error = "Unauthorized: owner only" })
@@ -112,6 +126,40 @@ Handlers.add(
             stored_count = stored_count,
             total_count = State.ReceiptCount
         })
+    end
+)
+
+--[[
+Freeze the process (emergency stop).
+Owner only.
+]]
+Handlers.add(
+    "Freeze",
+    Handlers.utils.hasMatchingTag("Action", "Freeze"),
+    function(msg)
+        if not is_owner(msg) then
+            send_reply(msg, "Error", { error = "Unauthorized: owner only" })
+            return
+        end
+        State.Frozen = true
+        send_reply(msg, "Frozen", { frozen = true })
+    end
+)
+
+--[[
+Unfreeze the process.
+Owner only.
+]]
+Handlers.add(
+    "Unfreeze",
+    Handlers.utils.hasMatchingTag("Action", "Unfreeze"),
+    function(msg)
+        if not is_owner(msg) then
+            send_reply(msg, "Error", { error = "Unauthorized: owner only" })
+            return
+        end
+        State.Frozen = false
+        send_reply(msg, "Unfrozen", { frozen = false })
     end
 )
 
@@ -224,6 +272,7 @@ Handlers.add(
         send_reply(msg, "Stats", {
             receipt_count = State.ReceiptCount,
             owner = State.Owner,
+            frozen = State.Frozen,
             version = State.Version,
             process_id = ao.id
         })
