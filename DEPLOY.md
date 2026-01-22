@@ -179,7 +179,7 @@ curl http://localhost:3100/stats
 | Store receipts | ~0.0001 AR per batch |
 | Query receipts | Free (read-only) |
 
-At current AR prices (~$20), expect <$1/month for moderate usage.
+At current AR prices (~$4), expect <$1/month for moderate usage.
 
 ---
 
